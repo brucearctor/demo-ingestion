@@ -1,0 +1,10 @@
+{
+	"name": "Demo Ingestion",
+	"dockerFile" : "../Dockerfile",
+	"postAttachCommand": "git config --global --add safe.directory /workspaces/demo-ingestion && pre-commit install",
+	"customizations": {
+		"vscode": {
+		  "extensions": ["gamunu.opentofu"]
+		}
+	  }
+}
