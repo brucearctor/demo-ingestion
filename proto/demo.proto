@@ -1,6 +1,8 @@
 syntax = "proto3";
 package demo_ingestion;
 
+option go_package = "buf.build/gen/go/brucearctor/demo-ingestion/protocolbuffers/go";
+
 import "google/api/annotations.proto";
 
 message PostFlightStatusRequest {
