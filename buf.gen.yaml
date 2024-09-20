@@ -1,24 +1,24 @@
 version: v2
 managed:
   enabled: true
-  override:
-    - file_option: go_package_prefix
-      # <module_name>   : name in go.mod
-      # <relative_path> : where generated code should be output
-      ## value: # <module_name>/<relative_path>
+  # override:
+  #   - file_option: go_package_prefix
+  #     # <module_name>   : name in go.mod
+  #     # <relative_path> : where generated code should be output
+  #     ## value: # <module_name>/<relative_path>
   # Remove `disable` field if googleapis is not used
-  disable:
-    - module: buf.build/googleapis/googleapis
-      file_option: go_package_prefix
+  # disable:
+  #   - module: buf.build/googleapis/googleapis
+  #     file_option: go_package_prefix
 plugins:
   - remote: buf.build/protocolbuffers/go:v1.34.2
     out: gen
-    opt:
-      - paths=source_relative
+    # opt:
+    #   - paths=source_relative
   # Use the latest version of protoc-gen-go-grpc
-  - remote: buf.build/grpc/go
-    out: gen/go
-    opt: paths=source_relative
-  - remote: buf.build/googlecloudplatform/bq-schema:v1.1.0
-    out: gen/bq
-    opt: paths=source_relative
+  # - remote: buf.build/grpc/go
+  #   out: gen/go
+  #   opt: paths=source_relative
+  # - remote: buf.build/googlecloudplatform/bq-schema:v1.1.0
+  #   out: gen/bq
+  #   opt: paths=source_relative
