@@ -3,24 +3,15 @@ on: # Apply to all pushes to `main`
   push:
     branches:
       - main
-env:
-  BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
-  validate-and-push-protos:
+  buf:
     runs-on: ubuntu-latest
     steps:
-      # Run `git checkout`
       - uses: actions/checkout@v4
-      # Install the `buf` CLI
-      - uses: bufbuild/buf-setup-action@v1
-      # Run a lint check on Protobuf sources
-      # IGNORING for now
-      #- uses: bufbuild/buf-lint-action@v1
-      # Run breaking change detection for Protobuf sources against the current `main` branch
-      #- uses: bufbuild/buf-breaking-action@v1
-      # Push the validated module to the BSR
-      - uses: bufbuild/buf-push-action@v1
+      - uses: bufbuild/buf-action@v1
         with:
-          #buf_token: ${{ secrets.BUF_TOKEN }}
-          create_visibility: public
+          token: ${{ secrets.BUF_TOKEN }}
