@@ -1,5 +1,4 @@
 version: v1
-# TODO NAME -- ex: buf.build/repo/...
-# name: demo-ingestion
+name: buf.build/brucearctor/demo-ingestion
 deps:
   - buf.build/googleapis/googleapis
