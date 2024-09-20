@@ -1,6 +1,5 @@
 version: v1
-# TODO -- buf.build-repo
-name: demo-ingestion
+# TODO NAME -- ex: buf.build/repo/...
+# name: demo-ingestion
 deps:
   - buf.build/googleapis/googleapis
-  - buf.build/grpc-ecosystem/grpc-gateway

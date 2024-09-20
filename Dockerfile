@@ -6,9 +6,12 @@ RUN apt-get update && \
   ca-certificates \
   curl \
   fonts-powerline \
+  gcc \
   git-core \
   gnupg \
+  golang-go \
   jq \
+  make \
   pre-commit \
   python3 \
   python3-dev \
@@ -43,6 +46,25 @@ RUN apt-get install -y tofu
 # RUN curl -L "$(curl -s https://api.github.com/repos/infracost/infracost/releases/latest | grep -o -E -m 1 "https://.+?-linux-amd64.tar.gz")" > infracost.tgz && tar -xzf infracost.tgz && rm infracost.tgz && mv infracost-linux-amd64 /usr/bin/infracost && infracost register
 # RUN curl -L "$(curl -s https://api.github.com/repos/minamijoyo/tfupdate/releases/latest | grep -o -E -m 1 "https://.+?_linux_amd64.tar.gz")" > tfupdate.tar.gz && tar -xzf tfupdate.tar.gz tfupdate && rm tfupdate.tar.gz && mv tfupdate /usr/bin/
 # RUN curl -L "$(curl -s https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E -m 1 "https://.+?_linux_amd64.tar.gz")" > hcledit.tar.gz && tar -xzf hcledit.tar.gz hcledit && rm hcledit.tar.gz && mv hcledit /usr/bin/
+
+
+# BUF
+ENV PREFIX="/usr/local"
+## TODO: VERSION/VAR at top of file?
+ENV VERSION="1.42.0"
+RUN curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | tar -xvzf - -C "${PREFIX}" --strip-components 1
+
+
+# Proto specific deps
+# TODO ... Latest :-/
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+
+
+## Set GOBIN on PATH
+ENV GO_BIN "/root/go/bin"
+# Add the Go bin directory to the PATH
+ENV PATH="$PATH:$GO_BIN"
 
 
 

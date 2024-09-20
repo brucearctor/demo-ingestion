@@ -1,0 +1,10 @@
+version: v1
+plugins:
+  - plugin: go
+    out: gen/go
+    opt:
+      - paths=source_relative
+  - plugin: openapiv2
+    out: gen/openapiv2
+  - plugin: buf.build/googlecloudplatform/bq-schema:v1.1.0
+    out: gen/bq
