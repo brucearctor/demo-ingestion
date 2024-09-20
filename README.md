@@ -10,3 +10,9 @@
 This is my first exploration with OpenToFu, so adding/exploring some new tools
 
 ex: https://github.com/tofuutils/pre-commit-opentofu and https://github.com/gamunu/vscode-opentofu
+
+
+
+##### TODO
+
+* configure buf registry
