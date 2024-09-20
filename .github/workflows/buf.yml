@@ -3,6 +3,9 @@ on: # Apply to all pushes to `main`
   push:
     branches:
       - main
+env:
+  BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+
 jobs:
   validate-and-push-protos:
     runs-on: ubuntu-latest
@@ -19,5 +22,5 @@ jobs:
       # Push the validated module to the BSR
       - uses: bufbuild/buf-push-action@v1
         with:
-          buf_token: ${{ secrets.BUF_TOKEN }}
+          #buf_token: ${{ secrets.BUF_TOKEN }}
           create_visibility: public
