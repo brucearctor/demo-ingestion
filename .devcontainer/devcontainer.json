@@ -4,7 +4,7 @@
 	"postAttachCommand": "git config --global --add safe.directory /workspaces/demo-ingestion && pre-commit install",
 	"customizations": {
 		"vscode": {
-		  "extensions": ["gamunu.opentofu", "zxh404.vscode-proto3", "ms-azuretools.vscode-docker" ]
+		  "extensions": ["gamunu.opentofu", "zxh404.vscode-proto3", "ms-azuretools.vscode-docker", "golang.Go" ]
 		}
 	  }
 }
