@@ -1,5 +1,5 @@
 syntax = "proto3";
-package demo_ingestion.v1;
+package demo_ingestion;
 option go_package = "github.com/brucearctor/demo-ingestion/gen/go/demo_ingestion/v1";
 
 import "google/api/annotations.proto";
