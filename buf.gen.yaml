@@ -11,8 +11,8 @@ managed:
   #   - module: buf.build/googleapis/googleapis
   #     file_option: go_package_prefix
 plugins:
-  - remote: buf.build/protocolbuffers/go:v1.34.2
-    out: gen
+  - remote: buf.build/protocolbuffers/go:v1.31.0
+    out: gen/go
     # opt:
     #   - paths=source_relative
   # Use the latest version of protoc-gen-go-grpc
