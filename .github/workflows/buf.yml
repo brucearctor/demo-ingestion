@@ -17,4 +17,4 @@ jobs:
       - uses: bufbuild/buf-action@v1
         with:
           token: ${{ secrets.BUF_TOKEN }}
-          path: proto/
+          path: proto/demo_ingestion/v1/
