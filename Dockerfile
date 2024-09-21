@@ -72,6 +72,9 @@ ENV PATH="$PATH:$GO_BIN"
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && apt-get update -y && apt-get install google-cloud-cli -y
 
 
+RUN add-apt-repository ppa:cncf-buildpacks/pack-cli
+RUN apt-get update
+RUN apt-get install -y pack-cli
 
 
 
@@ -87,9 +90,12 @@ RUN poetry config virtualenvs.create true
 RUN poetry lock --no-update
 RUN poetry install --no-interaction --no-ansi
 
-
 # Store var
 RUN ln -s $(poetry env info --path) /var/my-venv
+
+
+
+
 
 # Styling
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
