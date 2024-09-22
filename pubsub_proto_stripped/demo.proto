@@ -2,14 +2,7 @@ syntax = "proto3";
 
 package demo_ingest;
 
-option go_package = "buf.build/gen/go/brucearctor/demo-ingestion/protocolbuffers/go";
-
-// TODO import from remote
-import "bq_table.proto";
-import "google/api/annotations.proto";
-
 message PostFlightStatusRequest {
-  option (gen_bq_schema.bigquery_opts).table_name = "flight_status";
   string flight_id = 1;
   int64 scheduled_takeoff = 2; // maybe timestamp type
   int64 actual_takeoff = 3;
@@ -26,17 +19,4 @@ message PostFlightStatusRequest {
   string arriving_airport = 14; // ENUM?
   // TBD:  Do we want metadata [ ex: fields 11-14 ] transmitted in every message?
   // OR, maybe part of a flight_plan message that is distinct?
-}
-
-message PostFlightStatusResponse {
-    string response = 1;
-}
-
-service FlightsService {
-    rpc PostFlightStatus (PostFlightStatusRequest) returns (PostFlightStatusResponse) {
-      option (google.api.http) = {
-        post: "/v1/flightstatus"
-        body: "*"
-      };
-    }
 }

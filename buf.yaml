@@ -2,3 +2,4 @@ version: v1
 name: buf.build/brucearctor/demo-ingestion
 deps:
   - buf.build/googleapis/googleapis
+  - buf.build/unitytestorg/gen-bq-schema

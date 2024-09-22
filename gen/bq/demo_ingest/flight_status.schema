@@ -1,0 +1,79 @@
+[
+ {
+  "name": "flight_id",
+  "type": "STRING",
+  "mode": "NULLABLE"
+ },
+ {
+  "name": "scheduled_takeoff",
+  "type": "INTEGER",
+  "mode": "NULLABLE",
+  "description": "maybe timestamp type"
+ },
+ {
+  "name": "actual_takeoff",
+  "type": "INTEGER",
+  "mode": "NULLABLE"
+ },
+ {
+  "name": "current_timestamp",
+  "type": "INTEGER",
+  "mode": "NULLABLE"
+ },
+ {
+  "name": "altitude",
+  "type": "INTEGER",
+  "mode": "NULLABLE"
+ },
+ {
+  "name": "in_air",
+  "type": "BOOLEAN",
+  "mode": "NULLABLE",
+  "description": "TBD whether want this included"
+ },
+ {
+  "name": "landed",
+  "type": "BOOLEAN",
+  "mode": "NULLABLE"
+ },
+ {
+  "name": "latitude",
+  "type": "FLOAT",
+  "mode": "NULLABLE",
+  "description": "maybe lat/long type?"
+ },
+ {
+  "name": "longitude",
+  "type": "FLOAT",
+  "mode": "NULLABLE",
+  "description": "same?"
+ },
+ {
+  "name": "direction",
+  "type": "INTEGER",
+  "mode": "NULLABLE",
+  "description": "ex: 1-360 for degrees.  Else enum"
+ },
+ {
+  "name": "airline",
+  "type": "STRING",
+  "mode": "NULLABLE"
+ },
+ {
+  "name": "flight_number",
+  "type": "INTEGER",
+  "mode": "NULLABLE"
+ },
+ {
+  "name": "departing_airport",
+  "type": "STRING",
+  "mode": "NULLABLE",
+  "description": "ENUM?"
+ },
+ {
+  "name": "arriving_airport",
+  "type": "STRING",
+  "mode": "NULLABLE",
+  "description": "ENUM?"
+ }
+]

@@ -6,3 +6,8 @@ deps:
     repository: googleapis
     commit: e7f8d366f5264595bcc4cd4139af9973
     digest: shake256:e5e5f1c12f82e028ea696faa43b4f9dc6258a6d1226282962a8c8b282e10946281d815884f574bd279ebd9cd7588629beb3db17b892af6c33b56f92f8f67f509
+  - remote: buf.build
+    owner: unitytestorg
+    repository: gen-bq-schema
+    commit: cf9d2945ddb54ecb9222c8f397a49027
+    digest: shake256:f1a3cfb451f6546f1dfd1725738b97068cea016fb12b9a534695313c47fdfc0eb12d9dd8a84f8d89f6a879ccbd74e694afdcec2422468b747f138d42e951a74d

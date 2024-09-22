@@ -7,16 +7,10 @@
 
 ### OpenTofu Explore
 
-This is my first exploration with OpenToFu, so adding/exploring some new tools
+This is my first exploration with OpenToFu, so adding/exploring some new tool(s)
 
 ex: https://github.com/tofuutils/pre-commit-opentofu and https://github.com/gamunu/vscode-opentofu
 
-
-
-##### TODO
-
-* configure buf registry
-...  REMOTE config still not working.  That'll be a cleanup item.
 
 
 
@@ -24,5 +18,22 @@ ex: https://github.com/tofuutils/pre-commit-opentofu and https://github.com/gamu
 Esp. on 'new' devcontainer container:
 
 `gcloud init` .. and to through login flow
-also `gcloud auth application-default login`
+also `gcloud auth application-default login` -- considering this acceptable for development, esp. ahead of better CI.
 These are both while doing local/testing, ahead of tofu deploys happening as part of CI.
+
+
+
+# Collector
+
+
+## RUNNING ( locally )
+GCP_PROJECT=brucearctor-demo-ingestion TOPIC=demo-topic FUNCTION_TARGET=ReceiveAndPublish LOCAL_ONLY=true go run cmd/main.go
+
+
+
+
+
+
+##### TODO
+
+* configure buf registry ...

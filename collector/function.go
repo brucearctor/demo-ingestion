@@ -7,9 +7,9 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 
-	fp "gen/go/buf.build/gen/go/brucearctor/demo-ingestion/protocolbuffers/go"
+	// TODO: get this to import from buf.build rather than local
+	fp "github.com/brucearctor/demo-ingestion/collector/_go/proto"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -17,13 +17,16 @@ import (
 )
 
 // GCP_PROJECT is a user-set environment variable.
-var projectID = os.Getenv("GCP_PROJECT")
-var topicID = os.Getenv("TOPIC")
+// var projectID = os.Getenv("GCP_PROJECT")
+// var topicID = os.Getenv("TOPIC")
+var TopicID string
 
 // client is a global Pub/Sub client, initialized once per instance.
 var client *pubsub.Client
 
 func init() {
+	// TODO move this to env
+	var projectID = "brucearctor-demo-ingestion"
 
 	var err error
 	// client is initialized with context.Background() because it should
@@ -37,6 +40,9 @@ func init() {
 }
 
 func receiveAndPublish(w http.ResponseWriter, r *http.Request) {
+	// TODO move to env
+	topicID := "demo-topic"
+
 	// ProtobufMessage is from a generated pb.go with same package name
 	p := &fp.PostFlightStatusRequest{}
 	data, err := io.ReadAll(r.Body)
