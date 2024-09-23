@@ -4,6 +4,15 @@
 
 
 
+### Generating Protos
+`buf generate --exclude-path pubsub_proto_stripped`
+
+we need to ignore the proto in there
+
+THere are some other ways to handle with a bit more engineering.
+
+Also/otherwise, maybe there is an option for exclude path in relevnt buf yaml file?
+
 
 ### OpenTofu Explore
 
@@ -29,7 +38,8 @@ These are both while doing local/testing, ahead of tofu deploys happening as par
 ## RUNNING ( locally )
 GCP_PROJECT=brucearctor-demo-ingestion TOPIC=demo-topic FUNCTION_TARGET=ReceiveAndPublish LOCAL_ONLY=true go run cmd/main.go
 
-
+## Transcoding
+I forgot about grpc-gateway :-/
 
 
 
@@ -37,3 +47,19 @@ GCP_PROJECT=brucearctor-demo-ingestion TOPIC=demo-topic FUNCTION_TARGET=ReceiveA
 ##### TODO
 
 * configure buf registry ...
+
+* get projectid/topicname from env vars, not hardcoded...
+
+* KMS
+
+
+### corefirestore [ function ]
+
+* remove extra logging functions
+* firestoreClient to init [ for reuse ]
+
+
+
+## Devcontainer
+
+Get Buf Auth working, so not run into the rate limiting when unauthenticated using remote plugins [ https://buf.build/docs/bsr/rate-limits ]

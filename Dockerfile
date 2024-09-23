@@ -22,7 +22,6 @@ RUN apt-get update && \
   wget \
   unzip \
   vim \
-  zip \
   zsh
 
 

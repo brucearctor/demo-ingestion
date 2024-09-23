@@ -2,3 +2,4 @@
 .ruff_cache
 .terraform
 .terraform.lock.hcl
+python-pubsub

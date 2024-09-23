@@ -36,7 +36,6 @@ func init() {
 		log.Fatalf("pubsub.NewClient: %v", err)
 	}
 	functions.HTTP("ReceiveAndPublish", receiveAndPublish)
-
 }
 
 func receiveAndPublish(w http.ResponseWriter, r *http.Request) {

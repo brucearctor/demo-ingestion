@@ -60,6 +60,9 @@ python = "^3.11.0"
 black = "24.8.0"
 ruff = "0.6.5"
 checkov = "3.2.255"
+functions-framework = "^3.8.1"
+google-cloud-firestore = "^2.18.0"
+
 
 [build-system]
 requires = ["poetry-core>=1.6"]
