@@ -3,7 +3,6 @@
 ## Trying some 'serverless' rather 'fast' data ingestion pipelines...
 
 
-
 ### Generating Protos
 `buf generate --exclude-path pubsub_proto_stripped`
 
@@ -51,6 +50,22 @@ I forgot about grpc-gateway :-/
 * get projectid/topicname from env vars, not hardcoded...
 
 * KMS
+
+* Missing Loadbalancer
+
+* How to handle security for the incoming data?
+
+* revise proto fields
+
+* Read data -- share how...
+
+* Fix code for 'inair' flights
+
+* Document architecture and add to README
+
+* Get checkov action running ... plus what other security?
+
+* Cleanup README to be followable
 
 
 ### corefirestore [ function ]
