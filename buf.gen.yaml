@@ -15,6 +15,10 @@ plugins:
     out: currentflights/_go
     opt:
       - paths=source_relative
+  - remote: buf.build/protocolbuffers/go:v1.31.0
+    out: inairflights/_go
+    opt:
+      - paths=source_relative
   - remote: buf.build/googlecloudplatform/bq-schema:v1.1.0
     out: gen/bq
     opt: paths=source_relative

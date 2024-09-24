@@ -2,44 +2,36 @@ package currentflights
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
-
-	"cloud.google.com/go/logging"
-
-	// TODO: get this to import from buf.build rather than local
-	fp "github.com/brucearctor/demo-ingestion/currentflights/_go/proto"
-	"google.golang.org/protobuf/proto"
 
 	firestore "cloud.google.com/go/firestore"
+	"cloud.google.com/go/logging"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+
+	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/googleapis/google-cloudevents-go/cloud/firestoredata"
+	"google.golang.org/protobuf/proto"
 )
 
-var firestoreClient *firestore.Client
+// set the GOOGLE_CLOUD_PROJECT environment variable when deploying.
+// var projectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
+var projectID = "brucearctor-demo-ingestion"
+
+// client is a Firestore client, reused between function invocations.
+var client *firestore.Client
 
 func init() {
-
-	// // TODO move this to env
-	var projectID = "brucearctor-demo-ingestion"
-
-	var err error
-
-	firestoreClient, err := firestore.NewClient(context.Background(), projectID)
-	if err != nil {
-		log.Fatalf("Failed to create Firestore client: %v", err)
-	}
-
-	functions.HTTP("ReceivePushAndInsert", receivePushAndInsert)
+	functions.CloudEvent("SetMostRecentFlights", setMostRecentFlights)
 }
 
-func receivePushAndInsert(w http.ResponseWriter, r *http.Request) {
+// HelloFirestore is triggered by a change to a Firestore document.
+func setMostRecentFlights(ctx context.Context, event event.Event) error {
 
-	ctx := context.Background()
+	// ctx := context.Background()
 
-	logName := "my-log"
+	logName := "my-currentflights-log"
 	projectID := "brucearctor-demo-ingestion"
 
 	logClient, err := logging.NewClient(ctx, projectID)
@@ -51,42 +43,17 @@ func receivePushAndInsert(w http.ResponseWriter, r *http.Request) {
 	logger := logClient.Logger(logName).StandardLogger(logging.Info)
 	logger.Println("hello world")
 
-	body, err := io.ReadAll(r.Body)
-	// do I need to close the above?
-
-	if err != nil {
-		fmt.Fprintf(w, "Error reading message body: %v", err)
-		return
-	}
-	logger.Println("WOW")
-
-	// Parse the message into your Protobuf type
-	var msg fp.PostFlightStatusRequest
-	if err := proto.Unmarshal(body, &msg); err != nil {
-		logger.Printf("Error parsing Protobuf message: %v", err)
-		fmt.Fprintf(w, "Error parsing Protobuf message: %v", err)
-		return
-	}
-	logger.Println("FLIGHT ID:")
-	logger.Println(msg.FlightId)
-	// Convert Protobuf to JSON
-
-	jsonData, err := json.Marshal(&msg)
-	if err != nil {
-		logger.Printf("Error marshalling to JSON: %v", err)
-		fmt.Fprintf(w, "Error marshalling to JSON: %v", err)
-		return
+	var data firestoredata.DocumentEventData
+	if err := proto.Unmarshal(event.Data(), &data); err != nil {
+		return fmt.Errorf("proto.Unmarshal: %w", err)
 	}
 
-	logger.Printf("Successfully processed message: %v", string(jsonData))
-	logger.Printf("jsonData: %v", jsonData)
-
-	docRef := firestoreClient.Collection("flights").NewDoc()
-	_, err = docRef.Set(ctx, jsonData)
-	if err != nil {
-		log.Fatalf("Error creating document: %v", err)
-	}
-
-	fmt.Println("Flight added successfully!")
-
+	logger.Printf("Function triggered by change to: %v\n", event.Source())
+	logger.Printf("Old value: %+v\n", data.GetOldValue())
+	logger.Printf("New value: %+v\n", data.GetValue())
+	// logger.Printf(data.ProtoMessage())
+	fmt.Printf("Function triggered by change to: %v\n", event.Source())
+	fmt.Printf("Old value: %+v\n", data.GetOldValue())
+	fmt.Printf("New value: %+v\n", data.GetValue())
+	return nil
 }

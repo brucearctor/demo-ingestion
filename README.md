@@ -63,3 +63,12 @@ I forgot about grpc-gateway :-/
 ## Devcontainer
 
 Get Buf Auth working, so not run into the rate limiting when unauthenticated using remote plugins [ https://buf.build/docs/bsr/rate-limits ]
+
+
+
+
+
+
+###### Generic Cleanup
+
+[Best Practices for Cloud Functions](https://cloud.google.com/functions/docs/bestpractices/tips)

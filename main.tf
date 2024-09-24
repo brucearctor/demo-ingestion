@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 6.3"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 5.0"
+    }
   }
 }
 
@@ -20,6 +24,10 @@ provider "google" {
   region  = var.gcp_region
 }
 
+provider "google-beta" {
+  project = var.gcp_project_id
+  region  = var.gcp_region
+}
 
 
 #=========================
@@ -84,7 +92,8 @@ variable "gcp_service_list" {
     "artifactregistry.googleapis.com",
     "cloudfunctions.googleapis.com",
     "cloudbuild.googleapis.com",
-    "run.googleapis.com"
+    "run.googleapis.com",
+    "eventarc.googleapis.com"
   ]
 }
 
@@ -95,12 +104,18 @@ resource "google_project_service" "gcp_services" {
 }
 
 
+resource "google_firebase_project" "demo" {
+  provider = google-beta
+}
+
+
 # use following if tofu destroy and need to recreate
 # tofu import google_firestore_database.database demo-ingestion
 resource "google_firestore_database" "database" {
   name        = "demo-ingestion"
   location_id = "nam5"
   type        = "FIRESTORE_NATIVE"
+  # project_id  = google_firebase_project.demo.project_id
 }
 
 
@@ -229,7 +244,7 @@ resource "google_storage_bucket_object" "corefirestore_object" {
 
 
 resource "google_cloudfunctions2_function" "corefirestore" {
-  depends_on = [ google_storage_bucket_object.collector_object ]
+  depends_on  = [google_storage_bucket_object.collector_object]
   name        = "corefirestore"
   location    = "us-central1"
   description = "a core firestore function"
@@ -259,11 +274,11 @@ resource "google_cloudfunctions2_function" "corefirestore" {
 
 
 resource "google_cloud_run_service_iam_member" "corefirestore_push_member" {
-  depends_on = [ google_service_account.demo_pubsub_invoker, google_cloudfunctions2_function.corefirestore  ]
-  location = google_cloudfunctions2_function.corefirestore.location
-  service  = google_cloudfunctions2_function.corefirestore.name
-  role     = "roles/run.invoker"
-  member   = "serviceAccount:${google_service_account.demo_pubsub_invoker.email }"
+  depends_on = [google_service_account.demo_pubsub_invoker, google_cloudfunctions2_function.corefirestore]
+  location   = google_cloudfunctions2_function.corefirestore.location
+  service    = google_cloudfunctions2_function.corefirestore.name
+  role       = "roles/run.invoker"
+  member     = "serviceAccount:${google_service_account.demo_pubsub_invoker.email}"
 }
 
 
@@ -291,3 +306,106 @@ resource "google_pubsub_subscription" "corefirestore" {
   }
 
 }
+
+###### Skipping CurrentFlights ... by way of triggering on cloud firestore insert.
+###### This seems overkill [ at least, I do not want to do the parsing, currently ]
+
+# # https://cloud.google.com/eventarc/docs/creating-triggers-terraform
+# data "archive_file" "currentflights" {
+#   type        = "zip"
+#   output_path = "/tmp/currentflights-function-source.zip"
+#   source_dir  = "currentflights"
+# }
+
+
+# resource "google_storage_bucket_object" "currentflights_object" {
+#   name   = "currentflights-function-source.zip"
+#   bucket = google_storage_bucket.default.name
+#   source = data.archive_file.currentflights.output_path
+# }
+
+
+# resource "google_cloudfunctions2_function" "currentflights" {
+#   depends_on  = [google_storage_bucket_object.collector_object]
+#   name        = "currentflights"
+#   location    = "us-central1"
+#   description = "currentflights function"
+
+#   build_config {
+#     runtime     = "go122"
+#     entry_point = "SetMostRecentFlights"
+#     # environment_variables = {
+#     #     GCP_PROJECT = var.gcp_project_id
+#     #     TOPIC = google_pubsub_topic.demo.name
+#     # }
+#     source {
+#       storage_source {
+#         bucket = google_storage_bucket.default.name
+#         object = google_storage_bucket_object.currentflights_object.name
+#       }
+#     }
+#   }
+#   # # TODO: Look at these values
+#   # service_config {
+#   #   max_instance_count  = 3
+#   #   min_instance_count = 1
+#   #   available_memory    = "256M"
+#   #   timeout_seconds     = 60
+#   #   environment_variables = {
+#   #       SERVICE_CONFIG_TEST = "config_test"
+#   #   }
+#   #   ingress_settings = "ALLOW_INTERNAL_ONLY"
+#   #   all_traffic_on_latest_revision = true
+#   #   service_account_email = google_service_account.account.email
+#   # }
+
+#   # TODO: WILL NEED MORE FILTERING
+#   event_trigger {
+#     trigger_region = "nam5"
+#     event_type     = "google.cloud.firestore.document.v1.created"
+#     retry_policy   = "RETRY_POLICY_RETRY"
+#     event_filters {
+#       attribute = "database"
+#       // TODO: get this from tfconfig
+#       value = "demo-ingestion"
+#     }
+#     # event_filters {
+#     #   attribute = "document"
+#     #   value     = "flights/*"
+#     #   operator  = "match-path-pattern" # This allows path patterns to be used in the value field
+#     # }
+#   }
+# }
+
+# # resource "google_service_account" "account" {
+# #   account_id   = "gcf-sa"
+# #   display_name = "Test Service Account - used for both the cloud function and eventarc trigger in the test"
+# # }
+
+# # # Permissions on the service account used by the function and Eventarc trigger
+# # resource "google_project_iam_member" "invoking" {
+# #   project = var.gcp_project_id
+# #   role    = "roles/run.invoker"
+# #   member  = "serviceAccount:${google_service_account.account.email}"
+# #   # TODO: WHY WAS THE FOLLOWING IN THE EXAMPLE?
+# #   #depends_on = [google_project_iam_member.gcs-pubsub-publishing]
+# # }
+
+# # resource "google_project_iam_member" "event-receiving" {
+# #   project = var.gcp_project_id
+# #   role    = "roles/eventarc.eventReceiver"
+# #   member  = "serviceAccount:${google_service_account.account.email}"
+# #   depends_on = [google_project_iam_member.invoking]
+# # }
+
+# # resource "google_project_iam_member" "artifactregistry-reader" {
+# #   project = var.gcp_project_id
+# #   role     = "roles/artifactregistry.reader"
+# #   member   = "serviceAccount:${google_service_account.account.email}"
+# #   depends_on = [google_project_iam_member.event-receiving]
+# # }
+
+
+## TODO:  Add relevant bits for inairflights
+## UNLESS just adding that code to the corefirestore function
+## Pros/Cons to discuss to understand organizational culture/preferences
