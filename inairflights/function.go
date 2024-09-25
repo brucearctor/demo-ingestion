@@ -76,7 +76,7 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 
 	// TODO:  Can firestore client be global var, and in init()
 	// TODO: database name as VAR, provided by terraform
-	logger.Println("OMG")
+	logger.Println("OMG2")
 
 	firestoreClient, err := firestore.NewClientWithDatabase(context.Background(), projectID, "demo-ingestion")
 	if err != nil {
@@ -84,7 +84,7 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 	}
 
 	inAirColRef := firestoreClient.Collection("inair")
-	logger.Println("HERE")
+	logger.Println("HERE2")
 	// documentID := msg.FlightId
 
 	documentID := string(msg.FlightId)
@@ -103,17 +103,19 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: Do i need to cast these?
 	// This IF statement determines whether doc needs to be updated
+	logger.Println("checking timestamp diff ...")
+	// TODO: Better logic ... how about when one of these is missing?
 	if existingEventTime < msg.CurrentTimestamp {
+		logger.Println("in IF statement")
 		doc, err := inAirColRef.Doc(documentID).Set(ctx, dataMap)
 		if err != nil {
 			logger.Printf("collection.Doc().Get: %v", err)
 			log.Fatalf("collection.Doc().Get: %v", err)
 		}
+		logger.Println("DOC ------>")
 		fmt.Println(doc)
 		logger.Println(doc)
 	}
-
-	// TODO: CHECK IF time is more recent or not...
 
 	doc, err := inAirColRef.Doc(documentID).Set(ctx, dataMap)
 	if err != nil {
@@ -124,7 +126,7 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 	logger.Println(doc)
 	// Access the document data
 
-	logger.Println("DATA")
+	logger.Println("DATA2")
 
 	w.WriteHeader(http.StatusOK)
 }
