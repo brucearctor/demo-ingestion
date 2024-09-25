@@ -8,19 +8,15 @@ import (
 	"log"
 	"net/http"
 
-	// TODO: get this to import from buf.build rather than local
-
-	fp "github.com/brucearctor/demo-ingestion/inairflights/_go/proto"
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	// firebase "firebase.google.com/go"
-	firestore "cloud.google.com/go/firestore"
+	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/logging"
+	fp "github.com/brucearctor/demo-ingestion/inairflights/_go/proto"
 )
 
 func init() {
-
 	functions.HTTP("InAirFlights", inAirFlights)
 }
 
@@ -38,7 +34,6 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 	defer logClient.Close()
 
 	logger := logClient.Logger(logName).StandardLogger(logging.Info)
-	logger.Println("hello world")
 
 	body, err := io.ReadAll(r.Body)
 
@@ -67,8 +62,8 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Error marshalling to JSON: %v", err)
 		return
 	}
-	var data map[string]interface{}
-	err = json.Unmarshal(jsonData, &data)
+	var dataMap map[string]interface{}
+	err = json.Unmarshal(jsonData, &dataMap)
 	if err != nil {
 		// logger.Printf("Error unmarshalling from JSON: %v", err)
 		fmt.Fprintf(w, "Error unmarshalling from JSON: %v", err)
@@ -81,20 +76,55 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 
 	// TODO:  Can firestore client be global var, and in init()
 	// TODO: database name as VAR, provided by terraform
+	logger.Println("OMG")
+
 	firestoreClient, err := firestore.NewClientWithDatabase(context.Background(), projectID, "demo-ingestion")
 	if err != nil {
 		log.Fatalf("Failed to create Firestore client: %v", err)
 	}
-	flightsColRef := firestoreClient.Collection("flights")
+
 	inAirColRef := firestoreClient.Collection("inair")
+	logger.Println("HERE")
+	// documentID := msg.FlightId
 
-	// TODO: QUERY inAir Collection to see if the data point is the most recent and relevant
-	// IF MOST RECENT then overwrite it
+	documentID := string(msg.FlightId)
 
-	_, err = flightsColRef.NewDoc().Set(ctx, data)
+	existingDoc, err := inAirColRef.Doc(documentID).Get(ctx)
 	if err != nil {
-		log.Fatalf("Error creating document: %v", err)
+		logger.Printf("collection.Doc().Get: %v", err)
+		//log.Fatalf("collection.Doc().Get: %v", err)
 	}
+
+	existingEventTime, ok := existingDoc.Data()["event_time"].(int64)
+	if !ok {
+		fmt.Println("event_time field is not a time.Time")
+		return
+	}
+
+	// TODO: Do i need to cast these?
+	// This IF statement determines whether doc needs to be updated
+	if existingEventTime < msg.CurrentTimestamp {
+		doc, err := inAirColRef.Doc(documentID).Set(ctx, dataMap)
+		if err != nil {
+			logger.Printf("collection.Doc().Get: %v", err)
+			log.Fatalf("collection.Doc().Get: %v", err)
+		}
+		fmt.Println(doc)
+		logger.Println(doc)
+	}
+
+	// TODO: CHECK IF time is more recent or not...
+
+	doc, err := inAirColRef.Doc(documentID).Set(ctx, dataMap)
+	if err != nil {
+		logger.Printf("collection.Doc().Get: %v", err)
+		log.Fatalf("collection.Doc().Get: %v", err)
+	}
+	fmt.Println(doc)
+	logger.Println(doc)
+	// Access the document data
+
+	logger.Println("DATA")
 
 	w.WriteHeader(http.StatusOK)
 }

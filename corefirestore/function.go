@@ -28,7 +28,7 @@ func receivePushAndInsert(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 
-	logName := "my-log"
+	logName := "my-currentflights-log"
 	projectID := "brucearctor-demo-ingestion"
 
 	logClient, err := logging.NewClient(ctx, projectID)
@@ -87,6 +87,7 @@ func receivePushAndInsert(w http.ResponseWriter, r *http.Request) {
 	}
 	colRef := firestoreClient.Collection("flights")
 	_, err = colRef.NewDoc().Set(ctx, data)
+
 	if err != nil {
 		log.Fatalf("Error creating document: %v", err)
 	}

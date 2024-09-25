@@ -409,3 +409,81 @@ resource "google_pubsub_subscription" "corefirestore" {
 ## TODO:  Add relevant bits for inairflights
 ## UNLESS just adding that code to the corefirestore function
 ## Pros/Cons to discuss to understand organizational culture/preferences
+
+
+
+
+
+data "archive_file" "inairflights" {
+  type        = "zip"
+  output_path = "/tmp/inairflights-function-source.zip"
+  source_dir  = "inairflights"
+}
+
+
+resource "google_storage_bucket_object" "inairflights_object" {
+  name   = "inairflights-function-source.zip"
+  bucket = google_storage_bucket.default.name
+  source = data.archive_file.inairflights.output_path
+}
+
+
+
+resource "google_cloudfunctions2_function" "inairflights" {
+  depends_on  = [google_storage_bucket_object.inairflights_object]
+  name        = "inairflights"
+  location    = "us-central1"
+  description = "a core firestore function"
+
+  build_config {
+    runtime     = "go122"
+    entry_point = "InAirFlights"
+    # environment_variables = {
+    #     GCP_PROJECT = var.gcp_project_id
+    #     TOPIC = google_pubsub_topic.demo.name
+    # }
+    source {
+      storage_source {
+        bucket = google_storage_bucket.default.name
+        object = google_storage_bucket_object.inairflights_object.name
+      }
+    }
+  }
+
+  # TODO: right size.  Took example/default values.
+  service_config {
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+  }
+}
+
+
+resource "google_cloud_run_service_iam_member" "inairflights_push_member" {
+  depends_on = [google_service_account.demo_pubsub_invoker, google_cloudfunctions2_function.corefirestore]
+  location   = google_cloudfunctions2_function.inairflights.location
+  service    = google_cloudfunctions2_function.inairflights.name
+  role       = "roles/run.invoker"
+  member     = "serviceAccount:${google_service_account.demo_pubsub_invoker.email}"
+}
+
+
+
+resource "google_pubsub_subscription" "inairflights" {
+
+  name  = "inairflights-push-subscription"
+  topic = google_pubsub_topic.demo.id
+
+  ack_deadline_seconds = 20
+
+  push_config {
+    push_endpoint = google_cloudfunctions2_function.inairflights.url
+    oidc_token {
+      service_account_email = google_service_account.demo_pubsub_invoker.email
+    }
+    no_wrapper {
+      write_metadata = false
+    }
+  }
+
+}

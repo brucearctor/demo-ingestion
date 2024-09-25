@@ -6,6 +6,8 @@ import (
 
 	// Blank-import the function package so the init() runs
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
+
+	_ "github.com/brucearctor/demo-ingestion/inairflights"
 )
 
 func main() {

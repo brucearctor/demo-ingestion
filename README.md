@@ -67,6 +67,14 @@ I forgot about grpc-gateway :-/
 
 * Cleanup README to be followable
 
+* emulators rather than 'real' deploy [ esp. thinking ahead for initial testing and quicker development ]
+
+#### 'edge' cases
+* What to do on start of flight/takeoff [ and if that is missing ]
+* same with landed
+
+
+
 
 ### corefirestore [ function ]
 
