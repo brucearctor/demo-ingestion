@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/protobuf/proto"
@@ -78,7 +79,7 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 	// TODO: database name as VAR, provided by terraform
 	logger.Println("OMG2")
 
-	firestoreClient, err := firestore.NewClientWithDatabase(context.Background(), projectID, "demo-ingestion")
+	firestoreClient, err := firestore.NewClient(context.Background(), projectID)
 	if err != nil {
 		log.Fatalf("Failed to create Firestore client: %v", err)
 	}
@@ -88,16 +89,29 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 	// documentID := msg.FlightId
 
 	documentID := string(msg.FlightId)
-
+	logger.Println("HERE3")
+	// TODO check what getting, AND more.
+	// MAYBE something like if COUNT of documents with flightid > 0...
+	// Also where eventarc comes in [ to ensure event already in flights, etc ]
 	existingDoc, err := inAirColRef.Doc(documentID).Get(ctx)
+	logger.Println("HERE4")
+
 	if err != nil {
+		logger.Println("WHERE!?")
 		logger.Printf("collection.Doc().Get: %v", err)
 		//log.Fatalf("collection.Doc().Get: %v", err)
 	}
+	logger.Println("HERE5")
+	logger.Println(existingDoc.Data()["current_timestamp"])
+	logger.Println("TYPEOF -->")
+	logger.Println(reflect.TypeOf(existingDoc.Data()["current_timestamp"]))
+	existingEventTime, ok := existingDoc.Data()["current_timestamp"].(int64)
 
-	existingEventTime, ok := existingDoc.Data()["event_time"].(int64)
 	if !ok {
-		fmt.Println("event_time field is not a time.Time")
+		// This shouldn't occur, but ...
+		// TODO: probably want a DLQ
+		fmt.Println("event_time field is not correct")
+		logger.Println("event_time field is not correct")
 		return
 	}
 
@@ -110,17 +124,22 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 		doc, err := inAirColRef.Doc(documentID).Set(ctx, dataMap)
 		if err != nil {
 			logger.Printf("collection.Doc().Get: %v", err)
-			log.Fatalf("collection.Doc().Get: %v", err)
+			// log.Fatalf("collection.Doc().Get: %v", err)
+			// This is not a fatal error, as it is possible that the document doesn't yet exist
+			// More complicated handling could be that FIRST insert ONLY if a 'takeoff' event
+			// For now, we tried, and we update.
+			// Invites questions of how to handle after already landed.
 		}
 		logger.Println("DOC ------>")
 		fmt.Println(doc)
 		logger.Println(doc)
 	}
+	logger.Println("WHEREAMI?")
 
 	doc, err := inAirColRef.Doc(documentID).Set(ctx, dataMap)
 	if err != nil {
-		logger.Printf("collection.Doc().Get: %v", err)
-		log.Fatalf("collection.Doc().Get: %v", err)
+		logger.Printf("collection.Doc().Set: %v", err)
+		log.Fatalf("collection.Doc().Set: %v", err)
 	}
 	fmt.Println(doc)
 	logger.Println(doc)

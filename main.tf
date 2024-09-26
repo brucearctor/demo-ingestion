@@ -104,18 +104,27 @@ resource "google_project_service" "gcp_services" {
 }
 
 
-resource "google_firebase_project" "demo" {
-  provider = google-beta
-}
+# resource "google_firebase_project" "demo" {
+#   provider = google-beta
+# }
 
 
 # use following if tofu destroy and need to recreate
 # tofu import google_firestore_database.database demo-ingestion
-resource "google_firestore_database" "database" {
-  name        = "demo-ingestion"
+# resource "google_firestore_database" "database" {
+#   name        = "demo-ingestion"
+#   location_id = "nam5"
+#   type        = "FIRESTORE_NATIVE"
+#   # project_id  = google_firebase_project.demo.project_id
+# }
+
+
+# use following if tofu destroy and need to recreate
+# tofu import google_firestore_database.database default
+resource "google_firestore_database" "default" {
+  name = "(default)"
   location_id = "nam5"
   type        = "FIRESTORE_NATIVE"
-  # project_id  = google_firebase_project.demo.project_id
 }
 
 

@@ -95,3 +95,14 @@ Get Buf Auth working, so not run into the rate limiting when unauthenticated usi
 ###### Generic Cleanup
 
 [Best Practices for Cloud Functions](https://cloud.google.com/functions/docs/bestpractices/tips)
+
+
+
+
+
+###### Remember
+
+* if redeploying a function, with a push subscription, this might take a bit for permissions to propogate
+*** Strangely it looks like it often takes a second TOFU Apply for the IAM to get applied.
+
+* will need to understand expected frequency of updates, tolerance for delays, and more.  Several ways to handle.

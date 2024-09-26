@@ -81,7 +81,7 @@ func receivePushAndInsert(w http.ResponseWriter, r *http.Request) {
 
 	// TODO:  Can firestore client be global var, and in init()
 	// TODO: database name as VAR, provided by terraform
-	firestoreClient, err := firestore.NewClientWithDatabase(context.Background(), projectID, "demo-ingestion")
+	firestoreClient, err := firestore.NewClient(context.Background(), projectID)
 	if err != nil {
 		log.Fatalf("Failed to create Firestore client: %v", err)
 	}
