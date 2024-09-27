@@ -105,7 +105,9 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 	logger.Println(existingDoc.Data()["current_timestamp"])
 	logger.Println("TYPEOF -->")
 	logger.Println(reflect.TypeOf(existingDoc.Data()["current_timestamp"]))
-	existingEventTime, ok := existingDoc.Data()["current_timestamp"].(int64)
+
+	// TODO: is float64 OK?
+	existingEventTime, ok := existingDoc.Data()["current_timestamp"]
 
 	if !ok {
 		// This shouldn't occur, but ...
@@ -119,7 +121,8 @@ func inAirFlights(w http.ResponseWriter, r *http.Request) {
 	// This IF statement determines whether doc needs to be updated
 	logger.Println("checking timestamp diff ...")
 	// TODO: Better logic ... how about when one of these is missing?
-	if existingEventTime < msg.CurrentTimestamp {
+	// TODO: cleanup type assertion/casting
+	if int64(existingEventTime.(float64)) < msg.CurrentTimestamp {
 		logger.Println("in IF statement")
 		doc, err := inAirColRef.Doc(documentID).Set(ctx, dataMap)
 		if err != nil {
